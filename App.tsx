@@ -25,7 +25,8 @@ import Animated, {
   useAnimatedGestureHandler,
   useAnimatedStyle,
   useSharedValue,
-  withSpring,
+  withDelay,
+  withTiming,
 } from 'react-native-reanimated';
 
 const App = () => {
@@ -52,6 +53,21 @@ const App = () => {
 
   const pressed = useSharedValue('notYet');
 
+  function onFlipRightDown(event) {
+    'worklet';
+    y.value = withDelay(500, withTiming(0));
+    rotation.value = withDelay(500, withTiming(-360));
+  }
+
+  function onFlipRightUP(event) {
+    'worklet';
+    if (event.translationY < startingPosition) {
+      y.value = withTiming(-400, {duration: 500});
+      rotation.value = withTiming(-180, {duration: 500});
+      onFlipRightDown(event);
+    }
+  }
+
   const eventHandler = useAnimatedGestureHandler({
     onStart: (event, ctx) => {
       // pressed.value = true;
@@ -60,14 +76,17 @@ const App = () => {
       console.log(event);
       if (pressed.value === 'right') {
         console.log('ran');
-        rotation.value = -20;
+        rotation.value = -5;
         x.value = startingPosition + event.translationX;
         y.value = startingPosition + event.translationY;
       }
     },
     onEnd: (event, ctx) => {
-      x.value = withSpring(startingPosition);
-      y.value = withSpring(startingPosition);
+      console.log('event', event);
+      // rotation.value = 0;
+      // x.value = withSpring(startingPosition);
+      // y.value = withSpring(startingPosition);
+      onFlipRightUP(event);
     },
   });
 
@@ -77,7 +96,6 @@ const App = () => {
     } else {
       pressed.value = 'left';
     }
-    console.log(e.changedTouches);
   });
 
   const styles = StyleSheet.create({
@@ -100,7 +118,7 @@ const App = () => {
     <SafeAreaView
       style={{
         flex: 1,
-        backgroundColor: 'white',
+        backgroundColor: 'black',
         justifyContent: 'flex-end',
         alignItems: 'center',
       }}>
