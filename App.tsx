@@ -15,23 +15,17 @@ import {CardView} from './src/CardView';
 const App = () => {
   const [data, setData] = useState([
     {
-      index: 2,
       cardBackgroundColor: 'rgb(247 , 246,251)',
       shimmerColor: 'rgb(152,157,182)',
-      scale: 0.96,
     },
 
     {
-      index: 1,
       cardBackgroundColor: 'rgb(252 , 136,141)',
       shimmerColor: 'rgb(145,54,39)',
-      scale: 0.98,
     },
     {
-      index: 0,
       cardBackgroundColor: 'rgb(185 , 208,255)',
       shimmerColor: 'rgb(93,113,192)',
-      scale: 1,
     },
   ]);
 
@@ -45,13 +39,12 @@ const App = () => {
       }}>
       <StatusBar barStyle={'light-content'} />
 
-      {data.map(item => {
+      {data.map((item, index, array) => {
         return (
           <CardView
             cardBackgroundColor={item?.cardBackgroundColor}
             shimmerColor={item?.shimmerColor}
-            scale={item.scale}
-            index={item?.index}
+            index={array.length - 1 - index}
           />
         );
       })}

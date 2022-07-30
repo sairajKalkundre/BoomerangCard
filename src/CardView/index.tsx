@@ -13,14 +13,17 @@ import Animated, {
   withSpring,
   withTiming,
 } from 'react-native-reanimated';
+import {mix} from 'react-native-redash';
 
-export const CardView = ({cardBackgroundColor, shimmerColor, scale, index}) => {
+export const CardView = ({cardBackgroundColor, shimmerColor, index}) => {
   const {width} = useWindowDimensions();
   const pressed = useSharedValue('notYet');
   const rotation = useSharedValue(0);
   const startingPosition = 0;
   const x = useSharedValue(startingPosition);
   const y = useSharedValue(index * -10);
+  console.log({index});
+  const scale = mix(index, 1, 0.94);
   const styles = StyleSheet.create({
     card: {
       height: 250,
@@ -28,7 +31,7 @@ export const CardView = ({cardBackgroundColor, shimmerColor, scale, index}) => {
       borderRadius: 20,
       justifyContent: 'flex-end',
       position: 'absolute',
-      bottom: 49,
+      bottom: 50,
     },
   });
 
