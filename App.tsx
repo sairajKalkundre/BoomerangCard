@@ -17,17 +17,30 @@ const App = () => {
     {
       cardBackgroundColor: 'rgb(247 , 246,251)',
       shimmerColor: 'rgb(152,157,182)',
+      color: 'white',
+      zindex: 0,
+      pos: 1,
     },
 
     {
       cardBackgroundColor: 'rgb(252 , 136,141)',
       shimmerColor: 'rgb(145,54,39)',
-    },
-    {
-      cardBackgroundColor: 'rgb(185 , 208,255)',
-      shimmerColor: 'rgb(93,113,192)',
+      color: 'red',
+      zindex: 1,
+      pos: 0,
     },
   ]);
+
+  const onFinished = () => {
+    let dupData = [...data];
+    let arr = dupData.map((zind, index, array) =>
+      zind.zindex === 0
+        ? {...zind, zindex: 1, pos: 0}
+        : {...zind, zindex: 0, pos: 1},
+    );
+    setData(arr);
+    console.log({arr});
+  };
 
   return (
     <SafeAreaView
@@ -39,12 +52,14 @@ const App = () => {
       }}>
       <StatusBar barStyle={'light-content'} />
 
-      {data.map((item, index, array) => {
+      {data.map(item => {
         return (
           <CardView
             cardBackgroundColor={item?.cardBackgroundColor}
             shimmerColor={item?.shimmerColor}
-            index={array.length - 1 - index}
+            index={item?.pos}
+            zIndexValue={item?.zindex}
+            onFinish={onFinished}
           />
         );
       })}

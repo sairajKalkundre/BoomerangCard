@@ -6,24 +6,29 @@ import {
   PanGestureHandler,
 } from 'react-native-gesture-handler';
 import Animated, {
+  runOnJS,
   useAnimatedGestureHandler,
   useAnimatedStyle,
   useSharedValue,
-  withDelay,
   withSpring,
   withTiming,
 } from 'react-native-reanimated';
-import {mix} from 'react-native-redash';
 
-export const CardView = ({cardBackgroundColor, shimmerColor, index}) => {
+export const CardView = ({
+  cardBackgroundColor,
+  shimmerColor,
+  index,
+  zIndexValue,
+  onFinish,
+}) => {
   const {width} = useWindowDimensions();
   const pressed = useSharedValue('notYet');
   const rotation = useSharedValue(0);
   const startingPosition = 0;
   const x = useSharedValue(startingPosition);
-  const y = useSharedValue(index * -10);
-  console.log({index});
-  const scale = mix(index, 1, 0.94);
+  const y = useSharedValue(index * -20);
+  console.log('y', y.value + '&&' + cardBackgroundColor + '$$' + index);
+  // const scale = mix(zIndexValue, 0.94, 1);
   const styles = StyleSheet.create({
     card: {
       height: 250,
@@ -41,7 +46,7 @@ export const CardView = ({cardBackgroundColor, shimmerColor, index}) => {
         {translateX: x.value},
         {translateY: y.value},
         {rotateZ: `${rotation.value}deg`},
-        {scaleX: scale},
+        // {scaleX: scale},
       ],
     };
   });
@@ -56,9 +61,10 @@ export const CardView = ({cardBackgroundColor, shimmerColor, index}) => {
 
   function onFlipRightDown(event) {
     'worklet';
-    x.value = withDelay(200, withTiming(0));
-    y.value = withDelay(200, withSpring(0));
-    rotation.value = withDelay(200, withTiming(-360));
+    x.value = withTiming(0);
+    y.value = withSpring(-30);
+    rotation.value = withTiming(-360);
+    console.log(index);
   }
 
   function onFlipRightUP(event) {
@@ -66,8 +72,12 @@ export const CardView = ({cardBackgroundColor, shimmerColor, index}) => {
     if (event.translationY < startingPosition) {
       x.value = withTiming(0, {duration: 200});
       y.value = withTiming(-400, {duration: 200});
-      rotation.value = withTiming(-180, {duration: 200});
-      onFlipRightDown(event);
+      rotation.value = withTiming(-180, {duration: 200}, finished => {
+        if (finished) {
+          runOnJS(onFinish)();
+          onFlipRightDown(event);
+        }
+      });
     } else {
       rotation.value = 0;
       x.value = withSpring(startingPosition);
@@ -80,16 +90,13 @@ export const CardView = ({cardBackgroundColor, shimmerColor, index}) => {
       // pressed.value = true;
     },
     onActive: (event, ctx) => {
-      console.log(event);
       if (pressed.value === 'right') {
-        console.log('ran');
         rotation.value = -5;
         x.value = startingPosition + event.translationX;
         y.value = startingPosition + event.translationY;
       }
     },
     onEnd: (event, ctx) => {
-      console.log('event', event);
       // rotation.value = 0;
       // x.value = withSpring(startingPosition);
       // y.value = withSpring(startingPosition);
@@ -103,7 +110,12 @@ export const CardView = ({cardBackgroundColor, shimmerColor, index}) => {
     <GestureDetector gesture={gesture}>
       <PanGestureHandler onGestureEvent={eventHandler}>
         <Animated.View
-          style={[styles.card, {backgroundColor: cardBackgroundColor}, uas]}>
+          style={[
+            styles.card,
+            {backgroundColor: cardBackgroundColor},
+            {zIndex: zIndexValue},
+            uas,
+          ]}>
           <View style={{flexDirection: 'row', margin: 30}}>
             <View
               style={{
