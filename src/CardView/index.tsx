@@ -13,6 +13,7 @@ import Animated, {
   withSpring,
   withTiming,
 } from 'react-native-reanimated';
+import {mix} from 'react-native-redash';
 
 export const CardView = ({
   cardBackgroundColor,
@@ -26,9 +27,11 @@ export const CardView = ({
   const rotation = useSharedValue(0);
   const startingPosition = 0;
   const x = useSharedValue(startingPosition);
-  const y = useSharedValue(index * -20);
+  const y = useSharedValue(0);
+  const scale = useSharedValue(0);
+  y.value = withSpring(mix(index, 0, -10));
   console.log('y', y.value + '&&' + cardBackgroundColor + '$$' + index);
-  // const scale = mix(zIndexValue, 0.94, 1);
+  scale.value = withSpring(mix(zIndexValue, 0.94, 1));
   const styles = StyleSheet.create({
     card: {
       height: 250,
@@ -46,7 +49,7 @@ export const CardView = ({
         {translateX: x.value},
         {translateY: y.value},
         {rotateZ: `${rotation.value}deg`},
-        // {scaleX: scale},
+        {scaleX: scale.value},
       ],
     };
   });
@@ -62,22 +65,29 @@ export const CardView = ({
   function onFlipRightDown(event) {
     'worklet';
     x.value = withTiming(0);
-    y.value = withSpring(-30);
-    rotation.value = withTiming(-360);
-    console.log(index);
+    y.value = withSpring(0);
+    // rotation.value = withDelay(0, withTiming(-330));
+    console.log(index + cardBackgroundColor);
   }
 
   function onFlipRightUP(event) {
     'worklet';
     if (event.translationY < startingPosition) {
+      rotation.value = withTiming(-360, {duration: 500});
       x.value = withTiming(0, {duration: 200});
-      y.value = withTiming(-400, {duration: 200});
-      rotation.value = withTiming(-180, {duration: 200}, finished => {
+      y.value = withTiming(-400, {duration: 200}, finished => {
         if (finished) {
           runOnJS(onFinish)();
-          onFlipRightDown(event);
+          // onFlipRightDown(event);
         }
       });
+      // onFlipRightDown(event);
+      // rotation.value = withTiming(-330, {duration: 400}, finished => {
+      //   if (finished) {
+      //     // runOnJS(onFinish)();
+      //     onFlipRightDown(event);
+      //   }
+      // });
     } else {
       rotation.value = 0;
       x.value = withSpring(startingPosition);
