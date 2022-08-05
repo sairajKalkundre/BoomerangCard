@@ -29,13 +29,13 @@ export const CardView = ({
   const x = useSharedValue(startingPosition);
   const y = useSharedValue(0);
   const scale = useSharedValue(0);
-  y.value = withSpring(mix(index, 0, -10));
+  y.value = withTiming(mix(index, 0, -7));
   console.log('y', y.value + '&&' + cardBackgroundColor + '$$' + index);
   scale.value = withSpring(mix(zIndexValue, 0.94, 1));
   const styles = StyleSheet.create({
     card: {
-      height: 250,
-      width: width - 50,
+      height: 240,
+      width: width - 80,
       borderRadius: 20,
       justifyContent: 'flex-end',
       position: 'absolute',
