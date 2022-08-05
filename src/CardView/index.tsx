@@ -62,12 +62,21 @@ export const CardView = ({
     }
   });
 
-  function onFlipRightDown(event) {
+  function onFlipLeftUP(event) {
     'worklet';
-    x.value = withTiming(0);
-    y.value = withSpring(0);
-    // rotation.value = withDelay(0, withTiming(-330));
-    console.log(index + cardBackgroundColor);
+    if (event.translationY < startingPosition) {
+      rotation.value = withTiming(360, {duration: 500});
+      x.value = withTiming(0, {duration: 200});
+      y.value = withTiming(-400, {duration: 200}, finished => {
+        if (finished) {
+          runOnJS(onFinish)();
+        }
+      });
+    } else {
+      rotation.value = 0;
+      x.value = withSpring(startingPosition);
+      y.value = withSpring(startingPosition);
+    }
   }
 
   function onFlipRightUP(event) {
@@ -78,16 +87,8 @@ export const CardView = ({
       y.value = withTiming(-400, {duration: 200}, finished => {
         if (finished) {
           runOnJS(onFinish)();
-          // onFlipRightDown(event);
         }
       });
-      // onFlipRightDown(event);
-      // rotation.value = withTiming(-330, {duration: 400}, finished => {
-      //   if (finished) {
-      //     // runOnJS(onFinish)();
-      //     onFlipRightDown(event);
-      //   }
-      // });
     } else {
       rotation.value = 0;
       x.value = withSpring(startingPosition);
@@ -104,14 +105,17 @@ export const CardView = ({
         rotation.value = -5;
         x.value = startingPosition + event.translationX;
         y.value = startingPosition + event.translationY;
+      } else {
+        rotation.value = 5;
+        x.value = startingPosition + event.translationX;
+        y.value = startingPosition + event.translationY;
       }
     },
     onEnd: (event, ctx) => {
-      // rotation.value = 0;
-      // x.value = withSpring(startingPosition);
-      // y.value = withSpring(startingPosition);
       if (pressed.value === 'right') {
         onFlipRightUP(event);
+      } else {
+        onFlipLeftUP(event);
       }
     },
   });

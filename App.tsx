@@ -19,7 +19,7 @@ const App = () => {
       shimmerColor: 'rgb(152,157,182)',
       color: 'white',
       zindex: 0,
-      pos: 1,
+      pos: 2,
     },
 
     {
@@ -27,19 +27,48 @@ const App = () => {
       shimmerColor: 'rgb(145,54,39)',
       color: 'red',
       zindex: 1,
+      pos: 1,
+    },
+    {
+      cardBackgroundColor: 'rgb(185 , 208,255)',
+      shimmerColor: 'rgb(93,113,192)',
+      color: 'purple',
+      zindex: 2,
       pos: 0,
     },
   ]);
 
   const onFinished = () => {
     let dupData = [...data];
-    let arr = dupData.map((zind, index, array) =>
-      zind.zindex === 0
-        ? {...zind, zindex: 1, pos: 0}
-        : {...zind, zindex: 0, pos: 1},
-    );
-    setData(arr);
-    console.log({arr});
+    let dupThreeCardData = dupData.map((item, index) => {
+      if (index === 0) {
+        if (item?.zindex === 0 && item?.pos === 2) {
+          return {...item, zindex: 1, pos: 1};
+        } else if (item?.zindex === 1 && item?.pos === 1) {
+          return {...item, zindex: 2, pos: 0};
+        } else {
+          return {...item, zindex: 0, pos: 2};
+        }
+      } else if (index === 1) {
+        if (item?.zindex === 1 && item?.pos === 1) {
+          return {...item, zindex: 2, pos: 0};
+        } else if (item?.zindex === 2 && item?.pos === 0) {
+          return {...item, zindex: 0, pos: 2};
+        } else {
+          return {...item, zindex: 1, pos: 1};
+        }
+      } else if (index === 2) {
+        if (item?.zindex === 2 && item?.pos === 0) {
+          return {...item, zindex: 0, pos: 2};
+        } else if (item?.zindex === 0 && item?.pos === 2) {
+          return {...item, zindex: 1, pos: 1};
+        } else {
+          return {...item, zindex: 2, pos: 0};
+        }
+      }
+    });
+    console.log({dupThreeCardData});
+    setData(dupThreeCardData);
   };
 
   return (
